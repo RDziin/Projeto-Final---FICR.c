@@ -16,6 +16,8 @@ typedef struct
 
 } Funcionario;
 
+int proxId = 1;
+
 // Função para inicializar as variáveis do vetor Funcionario e garantir que não ocorra erros
 void inicializarDados(Funcionario *funcionarios, int maxFunc)
 {
@@ -58,6 +60,11 @@ int carregarDados(Funcionario *funcionarios, char *bancoDeDados)
                 }
                 fscanf(arquivo, " %[^\n]", funcionarios[i].funcao);
                 fscanf(arquivo, "%f", &funcionarios[i].remuneracao);
+
+                if (funcionarios[i].id >= proxId)
+                {
+                    proxId = funcionarios[i].id + 1;
+                }
             }
         }
 
@@ -94,46 +101,69 @@ void salvarDados(Funcionario *funcionarios, int quantidade, char *bancoDeDados)
 // Utilizado para criar e adicionar um funcionario ao vetor
 void criarFuncionario(Funcionario *funcionarios, int *quantidade, int maxFunc)
 {
+    //Verifica se a quantidade máxima de funcionários já não foi atingida
     if (*quantidade >= maxFunc)
     {
         printf("Contigente atingido.\n");
         return;
     }
+    
+    //Verifica se o ID está disponível para uso para que não haja uma duplicação de IDs
+    int novoId = 0;
+    for (int i = 1; i < maxFunc; i++)
+    {
+        int idExistente = 0;
+        for (int j = 0; j < *quantidade; j++)
+        {
+            if (funcionarios[j].id == i)
+            {
+                idExistente = 1;
+                break;
+            }
+            
+        }
+        if (!idExistente)
+        {
+            novoId = i;
+            break;
+        }
+        
+        
+    }
+    
+    Funcionario *novoFunc = &funcionarios[*quantidade];
 
-    Funcionario *newFunc = &funcionarios[*quantidade];
-    int idFunc = *quantidade + 1;
-    newFunc->id = idFunc;
-    printf("ID: %d\n", idFunc);
-
+    novoFunc->id = novoId;
+    printf("ID: %d\n", novoFunc->id);
     do
     {
         printf("CPF (Apenas numeros.):");
-        scanf(" %[^\n]", newFunc->cpf);
-        if (strlen(newFunc->cpf) != 11)
+        scanf(" %[^\n]", novoFunc->cpf);
+        if (strlen(novoFunc->cpf) != 11)
         {
             printf("Erro: CPF invalido! \nTente novamente.\n");
         }
 
-    } while (strlen(newFunc->cpf) != 11);
+    } while (strlen(novoFunc->cpf) != 11);
 
     printf("Nome: ");
-    scanf(" %[^\n]", newFunc->nome);
+    scanf(" %[^\n]", novoFunc->nome);
 
     printf("Data de Nascimento: \n");
     printf("Dia: ");
-    scanf("%d", &newFunc->nascimento[0]);
+    scanf("%d", &novoFunc->nascimento[0]);
 
     printf("Mes: ");
-    scanf("%d", &newFunc->nascimento[1]);
+    scanf("%d", &novoFunc->nascimento[1]);
 
     printf("Ano: ");
-    scanf("%d", &newFunc->nascimento[2]);
+    scanf("%d", &novoFunc->nascimento[2]);
 
     printf("Funcao: ");
-    scanf(" %[^\n]", newFunc->funcao);
+    scanf(" %[^\n]", novoFunc->funcao);
 
     printf("Salario: ");
-    scanf("%f", &newFunc->remuneracao);
+    scanf("%f", &novoFunc->remuneracao);
 
     (*quantidade)++;
     printf("\nFuncionario %d cadastrado com sucesso!!\n", *quantidade);
@@ -245,7 +275,7 @@ void listarFuncionarios(Funcionario *funcionarios, int *quantidade)
     }
 }
 
-//Função que altera os dados dos funcionarios
+// Função que altera os dados dos funcionarios
 void alterarFuncionario(Funcionario *funcionarios, int *quantidade)
 {
 
@@ -277,7 +307,7 @@ void alterarFuncionario(Funcionario *funcionarios, int *quantidade)
             {
             case 's':
             case 'S':
-                printf("Qual campo será modificado?\n");
+                printf("Qual campo sera modificado?\n");
                 printf("1 - CPF\n");
                 printf("2 - Nome\n");
                 printf("3 - Data de Nascimento\n");
@@ -349,7 +379,6 @@ void alterarFuncionario(Funcionario *funcionarios, int *quantidade)
     {
         printf("Nao existe funcionario com o ID: %d\n", id);
     }
-    
 }
 
 // Função principal onde todas as outras funções serão executadas
